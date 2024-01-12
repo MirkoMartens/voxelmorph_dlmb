@@ -49,14 +49,12 @@ def volgen(
         resize_factor: Volume resize factor. Default is 1.
         add_feat_axis: Load volume arrays with added feature axis. Default is True.
     """
-    print("vol_names: "+vol_names+"\n")
     # convert glob path to filenames
     if isinstance(vol_names, str): # todo adjust this to make vol_names list of tuples
         if os.path.isdir(vol_names):
             vol_names = os.path.join(vol_names, '*')
         vol_names = glob.glob(vol_names)
 
-    print("vol_names afterwards: "+vol_names+"\n")
 
 
     if isinstance(segs, list) and len(segs) != len(vol_names):
@@ -69,19 +67,24 @@ def volgen(
         # load volumes and concatenate
         load_params = dict(np_var=np_var, add_batch_axis=True, add_feat_axis=add_feat_axis,
                            pad_shape=pad_shape, resize_factor=resize_factor)
-        imgs = [load_volfile_pair(vol_names[i], **load_params) for i in indices] 
-        vols = [np.concatenate(imgs, axis=0)]
+        pairs = [load_volfile_pair(vol_names[i], **load_params) for i in indices] 
+        
+        imgs1, imgs2 = zip(*pairs)
+        vol1 = np.concatenate(imgs1, axis=0)
+        vol2 = np.concatenate(imgs2, axis=0)
+
+        vols = [vol1, vol2]
 
         # optionally load segmentations and concatenate
-        if segs is True:
-            # assume inputs are npz files with 'seg' key
-            load_params['np_var'] = 'seg'  # be sure to load seg
-            s = [py.utils.load_volfile(vol_names[i], **load_params) for i in indices]
-            vols.append(np.concatenate(s, axis=0))
-        elif isinstance(segs, list):
-            # assume segs is a corresponding list of files or preloaded volumes
-            s = [py.utils.load_volfile(segs[i], **load_params) for i in indices]
-            vols.append(np.concatenate(s, axis=0))
+        # if segs is True:
+        #     # assume inputs are npz files with 'seg' key
+        #     load_params['np_var'] = 'seg'  # be sure to load seg
+        #     s = [py.utils.load_volfile(vol_names[i], **load_params) for i in indices]
+        #     vols.append(np.concatenate(s, axis=0))
+        # elif isinstance(segs, list):
+        #     # assume segs is a corresponding list of files or preloaded volumes
+        #     s = [py.utils.load_volfile(segs[i], **load_params) for i in indices]
+        #     vols.append(np.concatenate(s, axis=0))
 
         yield tuple(vols)
 
