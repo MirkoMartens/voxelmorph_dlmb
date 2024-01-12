@@ -1,0 +1,2 @@
+"data/test01.nii.gz" "data/test02.nii.gz"
+"data/test03.nii.gz" "data/test04.nii.gz"

@@ -6,6 +6,21 @@ import numpy as np
 from . import py
 
 
+def load_volfile_pair(pair, **kwargs):
+    """
+    Load a pair of volume files.
+
+    Parameters:
+        pair: Tuple containing two file paths or two preloaded volumes.
+        kwargs: Forwarded to load_volfile for each volume in the pair.
+
+    Returns:
+        Tuple of loaded volumes.
+    """
+    return tuple(py.utils.load_volfile(vol, **kwargs) for vol in pair)
+
+
+
 def volgen(
     vol_names,
     batch_size=1,
@@ -34,12 +49,15 @@ def volgen(
         resize_factor: Volume resize factor. Default is 1.
         add_feat_axis: Load volume arrays with added feature axis. Default is True.
     """
-
+    print("vol_names: "+vol_names+"\n")
     # convert glob path to filenames
-    if isinstance(vol_names, str):
+    if isinstance(vol_names, str): # todo adjust this to make vol_names list of tuples
         if os.path.isdir(vol_names):
             vol_names = os.path.join(vol_names, '*')
         vol_names = glob.glob(vol_names)
+
+    print("vol_names afterwards: "+vol_names+"\n")
+
 
     if isinstance(segs, list) and len(segs) != len(vol_names):
         raise ValueError('Number of image files must match number of seg files.')
@@ -51,7 +69,7 @@ def volgen(
         # load volumes and concatenate
         load_params = dict(np_var=np_var, add_batch_axis=True, add_feat_axis=add_feat_axis,
                            pad_shape=pad_shape, resize_factor=resize_factor)
-        imgs = [py.utils.load_volfile(vol_names[i], **load_params) for i in indices]
+        imgs = [load_volfile_pair(vol_names[i], **load_params) for i in indices] 
         vols = [np.concatenate(imgs, axis=0)]
 
         # optionally load segmentations and concatenate
@@ -68,6 +86,7 @@ def volgen(
         yield tuple(vols)
 
 
+# vol_names is a list of lists: [['"data/test01.nii.gz"', '"data/test02.nii.gz"'], ['"data/test03.nii.gz"', '"data/test04.nii.gz"']]
 def scan_to_scan(vol_names, bidir=False, batch_size=1, prob_same=0, no_warp=False, **kwargs):
     """
     Generator for scan-to-scan registration.
@@ -84,8 +103,9 @@ def scan_to_scan(vol_names, bidir=False, batch_size=1, prob_same=0, no_warp=Fals
     zeros = None
     gen = volgen(vol_names, batch_size=batch_size, **kwargs)
     while True:
-        scan1 = next(gen)[0]
-        scan2 = next(gen)[0]
+        scan_pair = next(gen)
+        scan1 = scan_pair[0]
+        scan2 = scan_pair[1]
 
         # some induced chance of making source and target equal
         if prob_same > 0 and np.random.rand() < prob_same:
