@@ -55,7 +55,9 @@ def volgen(
             vol_names = os.path.join(vol_names, '*')
         vol_names = glob.glob(vol_names)
 
-
+    for vol_name_tuple in vol_names:
+        for vol_name in vol_name_tuple:
+            print(vol_name)
 
     if isinstance(segs, list) and len(segs) != len(vol_names):
         raise ValueError('Number of image files must match number of seg files.')
