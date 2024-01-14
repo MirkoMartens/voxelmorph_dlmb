@@ -94,7 +94,9 @@ args = parser.parse_args()
 bidir = args.bidir
 
 # load and prepare training data
-train_files = vxm.py.utils.read_file_list(args.img_list, prefix=args.img_prefix,
+#train_files = vxm.py.utils.read_file_list(args.img_list, prefix=args.img_prefix,
+#                                          suffix=args.img_suffix)
+train_files = vxm.py.utils.read_pair_list(args.img_list, prefix=args.img_prefix,
                                           suffix=args.img_suffix)
 assert len(train_files) > 0, 'Could not find any training data.'
 
