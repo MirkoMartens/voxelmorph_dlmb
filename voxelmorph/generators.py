@@ -55,10 +55,6 @@ def volgen(
             vol_names = os.path.join(vol_names, '*')
         vol_names = glob.glob(vol_names)
 
-    for vol_name_tuple in vol_names:
-        for vol_name in vol_name_tuple:
-            print(vol_name)
-
     if isinstance(segs, list) and len(segs) != len(vol_names):
         raise ValueError('Number of image files must match number of seg files.')
 
@@ -70,7 +66,6 @@ def volgen(
         load_params = dict(np_var=np_var, add_batch_axis=True, add_feat_axis=add_feat_axis,
                            pad_shape=pad_shape, resize_factor=resize_factor)
         pairs = [load_volfile_pair(vol_names[i], **load_params) for i in indices] 
-        
         imgs1, imgs2 = zip(*pairs)
         vol1 = np.concatenate(imgs1, axis=0)
         vol2 = np.concatenate(imgs2, axis=0)
@@ -106,7 +101,7 @@ def scan_to_scan(vol_names, bidir=False, batch_size=1, prob_same=0, no_warp=Fals
         kwargs: Forwarded to the internal volgen generator.
     """
     zeros = None
-    gen = volgen(vol_names, batch_size=batch_size, **kwargs)
+    gen = volgen(vol_names, batch_size=batch_size, pad_shape=(390, 288, 320), **kwargs)
     while True:
         scan_pair = next(gen)
         scan1 = scan_pair[0]
