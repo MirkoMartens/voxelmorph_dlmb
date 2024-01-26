@@ -101,11 +101,11 @@ def scan_to_scan(vol_names, bidir=False, batch_size=1, prob_same=0, no_warp=Fals
         kwargs: Forwarded to the internal volgen generator.
     """
     zeros = None
-    gen = volgen(vol_names, batch_size=batch_size, pad_shape=(390, 288, 320), **kwargs)
+    gen = volgen(vol_names, batch_size=batch_size, **kwargs)
     while True:
         scan_pair = next(gen)
-        scan1 = scan_pair[0][:, :384, :, :]
-        scan2 = scan_pair[1][:, :384, :, :]
+        scan1 = scan_pair[0]
+        scan2 = scan_pair[1]
 
         # some induced chance of making source and target equal
         if prob_same > 0 and np.random.rand() < prob_same:
