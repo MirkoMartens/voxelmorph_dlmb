@@ -44,7 +44,7 @@ parser.add_argument('--img-list', required=True, help='line-seperated list of tr
 parser.add_argument('--img-prefix', help='optional input image file prefix')
 parser.add_argument('--img-suffix', help='optional input image file suffix')
 parser.add_argument('--atlas', help='atlas filename')
-parser.add_argument('--model-dir', default='models',
+parser.add_argument('--model-dir', default='hypermorph_models',
                     help='model output directory (default: models)')
 parser.add_argument('--multichannel', action='store_true',
                     help='specify that data has multiple channels')
@@ -83,7 +83,7 @@ parser.add_argument('--oversample-rate', type=float, default=0.2,
 args = parser.parse_args()
 
 # load and prepare training data
-train_files = vxm.py.utils.read_file_list(args.img_list, prefix=args.img_prefix,
+train_files = vxm.py.utils.read_pair_list(args.img_list, prefix=args.img_prefix,
                                           suffix=args.img_suffix)
 assert len(train_files) > 0, 'Could not find any training data.'
 
