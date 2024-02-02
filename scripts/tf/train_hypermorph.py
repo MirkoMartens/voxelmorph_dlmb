@@ -24,6 +24,7 @@ License.
 """
 
 import os
+import pickle
 import random
 import argparse
 import numpy as np
@@ -40,7 +41,7 @@ tf.compat.v1.disable_eager_execution()
 parser = argparse.ArgumentParser()
 
 # data organization parameters
-parser.add_argument('--img-list', required=True, help='line-seperated list of training files')
+parser.add_argument('--img-list', default='voxelmorph_dlmb/data/train_list.txt', help='line-seperated list of training files')
 parser.add_argument('--img-prefix', help='optional input image file prefix')
 parser.add_argument('--img-suffix', help='optional input image file suffix')
 parser.add_argument('--atlas', help='atlas filename')
@@ -54,7 +55,7 @@ parser.add_argument('--test-reg', nargs=3,
 # training parameters
 parser.add_argument('--gpu', default='0', help='GPU ID numbers (default: 0)')
 parser.add_argument('--batch-size', type=int, default=1, help='batch size (default: 1)')
-parser.add_argument('--epochs', type=int, default=6000,
+parser.add_argument('--epochs', type=int, default=800,
                     help='number of training epochs (default: 6000)')
 parser.add_argument('--steps-per-epoch', type=int, default=100,
                     help='steps per epoch (default: 100)')
@@ -181,12 +182,15 @@ model.compile(optimizer=tf.keras.optimizers.Adam(lr=args.lr), loss=[image_loss, 
 
 save_callback = tf.keras.callbacks.ModelCheckpoint(save_filename, period=100)
 
-model.fit_generator(generator,
+history = model.fit_generator(generator,
                     initial_epoch=args.initial_epoch,
                     epochs=args.epochs,
                     steps_per_epoch=args.steps_per_epoch,
                     callbacks=[save_callback],
                     verbose=1)
+
+with open('trainHistoryDict.pickle', 'wb') as file_pi:
+    pickle.dump(history.history, file_pi)
 
 # save final weights
 model.save(save_filename.format(epoch=args.epochs))
