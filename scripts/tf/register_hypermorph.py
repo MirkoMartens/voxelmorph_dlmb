@@ -32,7 +32,12 @@ License.
 import os
 import argparse
 import numpy as np
-import voxelmorph as vxm
+
+# import voxelmorph with tensorflow backend
+os.environ['NEURITE_BACKEND'] = 'tensorflow'
+os.environ['VXM_BACKEND'] = 'tensorflow'
+
+import voxelmorph as vxm # nopep8
 import tensorflow as tf
 
 
@@ -62,9 +67,9 @@ nb_feats = moving.shape[-1]
 
 with tf.device(device):
     # load model and predict
-    config_hyp = dict(inshape=inshape, input_model=None)
+    #config_hyp = dict(inshape=inshape, input_model=None)
     hypermorph_model = vxm.networks.HyperVxmDense.load(args.model)
-    moved, warp = hypermorph_model.predict([moving, fixed, np.reshape(1, (1, 1, 1))]) # third input?
+    moved, warp = hypermorph_model.predict([moving, fixed, np.reshape(1, (1, 1, 1))]) 
 
 # save warp
 if args.warp:
