@@ -64,7 +64,7 @@ with tf.device(device):
     # load model and predict
     config_hyp = dict(inshape=inshape, input_model=None)
     hypermorph_model = vxm.networks.HyperVxmDense.load(args.model)
-    moved, warp = hypermorph_model.predict([moving, fixed, np.reshape(1, (1, 1))]) # third input?
+    moved, warp = hypermorph_model.predict([moving, fixed, np.reshape(1, (1, 1, 1))]) # third input?
 
 # save warp
 if args.warp:
