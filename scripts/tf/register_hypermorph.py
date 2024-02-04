@@ -51,6 +51,8 @@ parser.add_argument('--warp', help='output warp deformation filename')
 parser.add_argument('-g', '--gpu', help='GPU number(s) - if not supplied, CPU is used')
 parser.add_argument('--multichannel', action='store_true',
                     help='specify that data has multiple channels')
+parser.add_argument('--lambda_val', default=0.01, help='lambda value')
+
 args = parser.parse_args()
 
 # tensorflow device handling
@@ -69,7 +71,7 @@ with tf.device(device):
     # load model and predict
     #config_hyp = dict(inshape=inshape, input_model=None)
     hypermorph_model = vxm.networks.HyperVxmDense.load(args.model)
-    moved, warp = hypermorph_model.predict([moving, fixed, np.reshape(1, (1, 1, 1))]) 
+    moved, warp = hypermorph_model.predict([moving, fixed, np.array([args.lambda_val])]) 
 
 # save warp
 if args.warp:
