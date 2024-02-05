@@ -51,7 +51,7 @@ parser.add_argument('--warp', help='output warp deformation filename')
 parser.add_argument('-g', '--gpu', help='GPU number(s) - if not supplied, CPU is used')
 parser.add_argument('--multichannel', action='store_true',
                     help='specify that data has multiple channels')
-parser.add_argument('--lambda_val', default=0.01, help='lambda value')
+parser.add_argument('--lambda_val', default=0.01, type=float, help='lambda value')
 
 args = parser.parse_args()
 
